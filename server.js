@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -9,8 +10,11 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB connection
-mongoose.connect('mongodb://127.0.0.1:27017/ev-charger', {
-});
+const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://admin:passw0rd123@cluster0.xu2papp.mongodb.net/ev-charger?appName=Cluster0';
+
+mongoose.connect(mongoURI)
+  .then(() => console.log(`Connected to MongoDB (${mongoURI.includes('127.0.0.1') ? 'Local' : 'Cloud'})`))
+  .catch(err => console.error('MongoDB connection error:', err));
 
 // User Schema
 const userSchema = new mongoose.Schema({
@@ -117,12 +121,22 @@ app.get('/api/trips', auth, async (req, res) => {
 app.post('/api/seed', async (req, res) => {
   await Station.deleteMany({});
   const stations = [
-    { name: "Tesla Supercharger", address: "123 Main St", latitude: 40.7128, longitude: -74.0060, chargerType: "Supercharger", availability: true, price: 0.28 },
-    { name: "ChargePoint", address: "456 Oak Ave", latitude: 40.7589, longitude: -73.9851, chargerType: "Level 2", availability: true, price: 0.15 },
-    { name: "EVgo", address: "789 Pine Rd", latitude: 40.7505, longitude: -73.9934, chargerType: "DC Fast", availability: false, price: 0.25 }
+    { name: "Indian Fuel (Mumbai Central)", address: "Opposite City Mall, Mumbai", latitude: 19.0860, longitude: 72.8877, chargerType: "Fast Charge", availability: true, price: 18 },
+    { name: "Indian Fuel (Thane Hub)", address: "LBS Marg, Thane West", latitude: 19.2283, longitude: 72.9881, chargerType: "Fast Charge", availability: true, price: 15 },
+    { name: "Indian Fuel (Highway Stop)", address: "NH-48 Express Way", latitude: 20.0000, longitude: 72.9000, chargerType: "Super Charger", availability: true, price: 20 },
+    { name: "Indian Fuel (Surat Entry)", address: "Ring Road, Surat", latitude: 21.1600, longitude: 72.8200, chargerType: "Slow Charge", availability: true, price: 12 },
+    { name: "Indian Fuel (Delhi Gate)", address: "Connaught Place, Delhi", latitude: 28.7141, longitude: 77.1125, chargerType: "Fast Charge", availability: true, price: 18 }
   ];
   await Station.insertMany(stations);
-  res.json({ message: 'Sample data added' });
+
+  // Create Admin User if not exists
+  const existingAdmin = await User.findOne({ email: 'admin@ev.com' });
+  if (!existingAdmin) {
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+    await User.create({ email: 'admin@ev.com', password: hashedPassword, name: 'Admin User' });
+  }
+
+  res.json({ message: 'Database seeded with Stations and Admin User' });
 });
 
 const PORT = process.env.PORT || 5000;

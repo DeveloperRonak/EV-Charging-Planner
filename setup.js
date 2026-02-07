@@ -1,7 +1,8 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-mongoose.connect('mongodb://127.0.0.1:27017/ev-charger', {
+mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://admin:passw0rd123@cluster0.xu2papp.mongodb.net/ev-charger?appName=Cluster0', {
 });
 
 const userSchema = new mongoose.Schema({
@@ -35,10 +36,11 @@ async function setup() {
   // Add sample charging stations
   await Station.deleteMany({});
   await Station.insertMany([
-    { name: "Tesla Supercharger NYC", address: "123 Broadway, New York, NY", latitude: 40.7128, longitude: -74.0060, chargerType: "Supercharger", availability: true, price: 0.28 },
-    { name: "ChargePoint Station", address: "456 5th Ave, New York, NY", latitude: 40.7589, longitude: -73.9851, chargerType: "Level 2", availability: true, price: 0.15 },
-    { name: "EVgo Fast Charger", address: "789 Park Ave, New York, NY", latitude: 40.7505, longitude: -73.9934, chargerType: "DC Fast", availability: false, price: 0.25 },
-    { name: "Electrify America", address: "321 Lexington Ave, New York, NY", latitude: 40.7505, longitude: -73.9779, chargerType: "DC Fast", availability: true, price: 0.30 }
+    { name: "Indian Fuel (Mumbai Central)", address: "Opposite City Mall, Mumbai", latitude: 19.0860, longitude: 72.8877, chargerType: "Fast Charge", availability: true, price: 18 },
+    { name: "Indian Fuel (Thane Hub)", address: "LBS Marg, Thane West", latitude: 19.2283, longitude: 72.9881, chargerType: "Fast Charge", availability: true, price: 15 },
+    { name: "Indian Fuel (Highway Stop)", address: "NH-48 Express Way", latitude: 20.0000, longitude: 72.9000, chargerType: "Super Charger", availability: true, price: 20 },
+    { name: "Indian Fuel (Surat Entry)", address: "Ring Road, Surat", latitude: 21.1600, longitude: 72.8200, chargerType: "Slow Charge", availability: true, price: 12 },
+    { name: "Indian Fuel (Delhi Gate)", address: "Connaught Place, Delhi", latitude: 28.7141, longitude: 77.1125, chargerType: "Fast Charge", availability: true, price: 18 }
   ]);
 
   console.log('Database setup complete!');

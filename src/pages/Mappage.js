@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import 'leaflet-routing-machine';
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
+import stationService from '../services/stationService';
 
 // 1. Fix Leaflet Default Icon Issue
 delete L.Icon.Default.prototype._getIconUrl;
@@ -38,14 +39,6 @@ const indianCities = [
   { id: 11, name: "Thane", lat: 19.2183, lng: 72.9781 }
 ];
 
-// 4. Define Charging Stations ("Indian Fuel")
-const evChargingStations = [
-  { id: 1, name: "Indian Fuel (Mumbai Central)", address: "Opposite City Mall, Mumbai", type: "Fast Charge", available: 4, total: 6, price: "₹18/kWh", lat: 19.0860, lng: 72.8877 },
-  { id: 2, name: "Indian Fuel (Thane Hub)", address: "LBS Marg, Thane West", type: "Fast Charge", available: 2, total: 4, price: "₹15/kWh", lat: 19.2283, lng: 72.9881 },
-  { id: 3, name: "Indian Fuel (Highway Stop)", address: "NH-48 Express Way", type: "Super Charger", available: 5, total: 8, price: "₹20/kWh", lat: 20.0000, lng: 72.9000 },
-  { id: 4, name: "Indian Fuel (Surat Entry)", address: "Ring Road, Surat", type: "Slow Charge", available: 1, total: 3, price: "₹12/kWh", lat: 21.1600, lng: 72.8200 },
-  { id: 5, name: "Indian Fuel (Delhi Gate)", address: "Connaught Place, Delhi", type: "Fast Charge", available: 3, total: 5, price: "₹18/kWh", lat: 28.7141, lng: 77.1125 }
-];
 
 // Helper: Calculate distance (Haversine Formula)
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
@@ -145,6 +138,28 @@ const Mappage = () => {
   const [endLocation, setEndLocation] = useState('');
   const [routeConfig, setRouteConfig] = useState(null); // Holds Start, End, and Station data
   const [routeData, setRouteData] = useState({ instructions: [], station: null });
+  const [evChargingStations, setEvStations] = useState([]);
+
+  useEffect(() => {
+    const fetchStations = async () => {
+      try {
+        const data = await stationService.getAllStations();
+        const formattedStations = data.map(s => ({
+          id: s._id,
+          name: s.name,
+          address: s.address,
+          type: s.chargerType,
+          price: `₹${s.price}/kWh`,
+          lat: s.latitude,
+          lng: s.longitude
+        }));
+        setEvStations(formattedStations);
+      } catch (error) {
+        console.error("Failed to fetch stations", error);
+      }
+    };
+    fetchStations();
+  }, []);
 
   const handleSearchRoute = () => {
     // 1. Find Cities

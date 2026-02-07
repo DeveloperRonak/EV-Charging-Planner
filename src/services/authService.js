@@ -1,10 +1,11 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 class AuthService {
   async login(email, password) {
     try {
+      console.log(`Attempting login to: ${API_URL}/api/login`);
       const response = await axios.post(`${API_URL}/api/login`, { email, password });
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
@@ -12,12 +13,22 @@ class AuthService {
       }
       return response.data;
     } catch (error) {
-      throw error.response?.data || { error: 'Login failed' };
+      console.error("Login Error:", error);
+      let message = 'Login failed';
+      if (error.response) {
+        message = error.response.data?.error || `Server Error: ${error.response.status}`;
+      } else if (error.request) {
+        message = 'Network Error: No response from server. Please check if backend is running.';
+      } else {
+        message = error.message;
+      }
+      throw new Error(message);
     }
   }
 
   async register(email, password, name) {
     try {
+      console.log(`Attempting registration to: ${API_URL}/api/register`);
       const response = await axios.post(`${API_URL}/api/register`, { email, password, name });
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
@@ -25,7 +36,16 @@ class AuthService {
       }
       return response.data;
     } catch (error) {
-      throw error.response?.data || { error: 'Registration failed' };
+      console.error("Registration Error:", error);
+      let message = 'Registration failed';
+      if (error.response) {
+        message = error.response.data?.error || `Server Error: ${error.response.status}`;
+      } else if (error.request) {
+        message = 'Network Error: No response from server. Please check if backend is running.';
+      } else {
+        message = error.message;
+      }
+      throw new Error(message);
     }
   }
 

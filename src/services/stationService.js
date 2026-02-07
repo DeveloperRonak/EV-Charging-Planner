@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = (process.env.REACT_APP_API_URL || 'http://localhost:5000') + '/api';
 
 class StationService {
   async getAllStations() {
@@ -8,7 +8,8 @@ class StationService {
       const response = await axios.get(`${API_URL}/stations`);
       return response.data;
     } catch (error) {
-      throw error.response?.data || { error: 'Failed to fetch stations' };
+      const message = error.response?.data?.error || error.message || 'Failed to fetch stations';
+      throw new Error(message);
     }
   }
 
@@ -20,7 +21,8 @@ class StationService {
       });
       return response.data;
     } catch (error) {
-      throw error.response?.data || { error: 'Failed to create trip' };
+      const message = error.response?.data?.error || error.message || 'Failed to create trip';
+      throw new Error(message);
     }
   }
 
@@ -32,9 +34,11 @@ class StationService {
       });
       return response.data;
     } catch (error) {
-      throw error.response?.data || { error: 'Failed to fetch trips' };
+      const message = error.response?.data?.error || error.message || 'Failed to fetch trips';
+      throw new Error(message);
     }
   }
 }
 
-export default new StationService();
+const stationService = new StationService();
+export default stationService;
