@@ -9,6 +9,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const JWT_SECRET = process.env.JWT_SECRET || 'secret123';
+
 // MongoDB connection
 const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/ev-charger';
 
@@ -52,7 +54,7 @@ const auth = (req, res, next) => {
   if (!token) return res.status(401).send('Access denied');
   
   try {
-    const decoded = jwt.verify(token, 'secret123');
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
     next();
   } catch {
@@ -63,7 +65,6 @@ const auth = (req, res, next) => {
 // Routes
 app.post('/api/register', async (req, res) => {
   try {
-    console.log('Registration request body:', req.body);
     const { email, password, name } = req.body;
     
     // Check if user already exists
@@ -75,7 +76,7 @@ app.post('/api/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ email, password: hashedPassword, name });
     await user.save();
-    const token = jwt.sign({ userId: user._id }, 'secret123');
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET);
     res.json({ token, user: { id: user._id, email, name } });
   } catch (error) {
     console.error('Registration error:', error);
@@ -90,7 +91,7 @@ app.post('/api/login', async (req, res) => {
     if (!user || !await bcrypt.compare(password, user.password)) {
       return res.status(400).json({ error: 'Invalid credentials' });
     }
-    const token = jwt.sign({ userId: user._id }, 'secret123');
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET);
     res.json({ token, user: { id: user._id, email: user.email, name: user.name } });
   } catch (error) {
     res.status(400).json({ error: 'Login failed' });

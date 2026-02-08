@@ -17,9 +17,7 @@ function Signup() {
         throw new Error('Passwords do not match');
       }
       
-      console.log('Registration data:', { name, email, password });
       const response = await authService.register(email, password, name);
-      console.log('Registration response:', response);
       navigate('/', { replace: true });
     } catch (err) {
       console.error("Signup Page Error:", err);
