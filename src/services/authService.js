@@ -5,7 +5,6 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 class AuthService {
   async login(email, password) {
     try {
-      console.log(`Attempting login to: ${API_URL}/api/login`);
       const response = await axios.post(`${API_URL}/api/login`, { email, password });
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
@@ -28,7 +27,6 @@ class AuthService {
 
   async register(email, password, name) {
     try {
-      console.log(`Attempting registration to: ${API_URL}/api/register`);
       const response = await axios.post(`${API_URL}/api/register`, { email, password, name });
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);

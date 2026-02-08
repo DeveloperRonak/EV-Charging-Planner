@@ -23,7 +23,7 @@ function Signup() {
       navigate('/', { replace: true });
     } catch (err) {
       console.error("Signup Page Error:", err);
-      setError(err.message || 'Signup failed. Please try again.');
+      setError(err.message || String(err));
     } finally {
       setLoading(false);
     }

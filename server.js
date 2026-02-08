@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB connection
-const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://admin:passw0rd123@cluster0.xu2papp.mongodb.net/ev-charger?appName=Cluster0';
+const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/ev-charger';
 
 mongoose.connect(mongoURI)
   .then(() => console.log(`Connected to MongoDB (${mongoURI.includes('127.0.0.1') ? 'Local' : 'Cloud'})`))

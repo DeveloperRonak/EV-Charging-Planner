@@ -2,7 +2,7 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://admin:passw0rd123@cluster0.xu2papp.mongodb.net/ev-charger?appName=Cluster0', {
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/ev-charger', {
 });
 
 const userSchema = new mongoose.Schema({
