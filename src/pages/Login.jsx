@@ -14,8 +14,6 @@ function Login() {
     
     try {
       const response = await authService.login(email, password);
-      console.log('Login response:', response);
-      console.log('Token:', response.token);
       if (response.token) {
         navigate('/home', { replace: true });
       } else {
